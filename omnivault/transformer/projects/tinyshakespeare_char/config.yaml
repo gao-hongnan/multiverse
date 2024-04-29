@@ -1,0 +1,106 @@
+constants: null
+logger:
+  log_file: 'decoder.log'
+  module_name: null
+  propagate: false
+  log_root_dir: './data/tinyshakespeare_char/logs'
+  rich_handler_config:
+    level: "INFO"
+    show_level: true
+    show_path: true
+    show_time: true
+    rich_tracebacks: true
+    markup: true
+    log_time_format: "[%Y-%m-%d %H:%M:%S]"
+global_:
+  seed: 42
+  debug: false
+  debug_samples: 512
+data:
+  context_length: 128
+  dataset_name: input
+  dataset_size: null
+  dataset_path: ./data/tinyshakespeare_char/input.txt
+  dataset_dir: ./data/tinyshakespeare_char
+  dataset_url: https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt
+  split: null
+  collate_fn: null
+  train_loader:
+    batch_size: 128
+    shuffle: true
+    num_workers: 0
+    pin_memory: false
+    drop_last: false
+  valid_loader: null
+  test_loader: null
+model:
+  d_model: 128
+  vocab_size: ??? # MISSING so need fill up later
+  context_length: ${data.context_length}
+  num_decoder_blocks: 5
+  dropout: 0.1
+  decoder_block:
+    masked_self_attention_mha:
+      attention:
+        _target_: omnivault.transformer.modules.attention.core.ScaledDotProductAttention
+      d_model: ${model.d_model}
+      H: 8
+      dropout: 0.1
+    feed_forward:
+      d_model: ${model.d_model}
+      d_ff: 512
+      activation:
+        _target_: torch.nn.GELU
+        approximate: "tanh"
+      dropout: 0.1
+      bias: true
+    add_norm_1:
+      feature_dim: ${model.d_model}
+      dropout: 0.1
+    add_norm_2:
+      feature_dim: ${model.d_model}
+      dropout: 0.1
+optimizer:
+  name: "torch.optim.AdamW"
+  lr: 0.0005
+  weight_decay: 0.01
+criterion:
+  name: "torch.nn.CrossEntropyLoss"
+  reduction: "mean"
+scheduler:
+  name: "torch.optim.lr_scheduler.CosineAnnealingLR"
+  T_max: ${trainer.max_epochs}
+  eta_min: 0.0
+  last_epoch: -1
+  verbose: false
+trainer:
+  device: "auto"
+  max_epochs: 2
+  log_every_n_steps: 100
+  eval_every_n_steps: 4
+  step_scheduler_on_batch_or_epoch: "epoch"
+  use_amp: false
+  autocast_config:
+    enabled: false
+    dtype: null
+    cache_enabled: null
+  scaler_config:
+    enabled: false
+    init_scale: 65536.0
+    growth_factor: 2.0
+    backoff_factor: 0.5
+    growth_interval: 2000
+  gradient_accumulation_steps: 1
+  clip_grad_norm: {max_norm: 1.0, norm_type: 2.0, error_if_nonfinite: false, "foreach": null}
+  apply_weight_decay_to_different_param_groups: false
+  save_dir: ./data/tinyshakespeare_char/checkpoints
+  save_every_epoch: false
+  save_best_only: true
+  monitor: "train_this_epoch_average_loss"
+  mode: "min"
+generator:
+  temperature: 1.0
+  max_tokens: 1000
+  greedy: false
+  top_k: 10
+  top_p: null

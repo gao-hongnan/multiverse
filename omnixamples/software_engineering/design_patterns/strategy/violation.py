@@ -1,0 +1,74 @@
+"""Shows a violation of the strategy pattern."""
+from enum import Enum, auto
+from typing import Any, List, Union
+
+
+class ModelType(Enum):
+    LINEAR_REGRESSION = auto()
+    DECISION_TREE = auto()
+    K_NEAREST_NEIGHBORS = auto()
+    GRADIENT_BOOSTING = auto()
+    NEURAL_NETWORK = auto()
+
+
+class LinearRegression:
+    def train(self, X: List[List[float]], y: List[float]) -> None:
+        print("Training linear regression model")
+        print(f"X: {X}, y: {y}")
+
+
+class DecisionTree:
+    def train(self, X: List[List[float]], y: List[float]) -> None:
+        print("Training decision tree model")
+        print(f"X: {X}, y: {y}")
+
+
+class KNN:
+    def train(self, X: List[List[float]], y: List[float]) -> None:
+        print("Training KNN model")
+        print(f"X: {X}, y: {y}")
+
+
+class GradientBoosting:
+    def train(self, X: List[List[float]], y: List[float]) -> None:
+        print("Training gradient boosting model")
+        print(f"X: {X}, y: {y}")
+
+
+class NeuralNetwork:
+    def train(self, X: List[List[float]], y: List[float]) -> None:
+        print("Training neural network model")
+        print(f"X: {X}, y: {y}")
+
+
+class Trainer:
+    def __init__(self, model_type: ModelType):
+        self.model_type = model_type
+        self.model: Union[
+            LinearRegression,
+            DecisionTree,
+            KNN,
+            GradientBoosting,
+            NeuralNetwork,
+        ]
+
+    def fit(self, X: Any, y: Any) -> None:
+        if self.model_type == ModelType.LINEAR_REGRESSION:
+            self.model = LinearRegression()
+        elif self.model_type == ModelType.DECISION_TREE:
+            self.model = DecisionTree()
+        elif self.model_type == ModelType.K_NEAREST_NEIGHBORS:
+            self.model = KNN()
+        elif self.model_type == ModelType.GRADIENT_BOOSTING:
+            self.model = GradientBoosting()
+        elif self.model_type == ModelType.NEURAL_NETWORK:
+            self.model = NeuralNetwork()
+        else:
+            raise ValueError("Invalid model type")
+
+        self.model.train(X, y)
+
+
+if __name__ == "__main__":
+    trainer = Trainer(model_type=ModelType.LINEAR_REGRESSION)
+    trainer.fit(X=None, y=None)
